@@ -1,0 +1,28 @@
+package frc.robot.commands;
+
+import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.subsystems.__MECHANISM_CLASS__;
+
+public class __COMMAND_CLASS__ extends Command {
+  private final __MECHANISM_CLASS__ subsystem;
+
+  public __COMMAND_CLASS__(__MECHANISM_CLASS__ subsystem) {
+    this.subsystem = subsystem;
+    addRequirements(subsystem);
+  }
+
+  @Override
+  public void execute() {
+    subsystem.runOpenLoop();
+  }
+
+  @Override
+  public void end(boolean interrupted) {
+    subsystem.stop();
+  }
+
+  @Override
+  public boolean isFinished() {
+    return false;
+  }
+}

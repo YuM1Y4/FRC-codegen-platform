@@ -1,0 +1,20 @@
+package frc.robot.subsystems;
+
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
+
+public class __MECHANISM_CLASS__ extends SubsystemBase {
+  public __MECHANISM_CLASS__() {}
+
+  public void runOpenLoop() {
+    // TODO: wire motor outputs for __MECHANISM_NAME__.
+  }
+
+  public void stop() {
+    // TODO: stop the __MECHANISM_NAME__ safely.
+  }
+
+  public Command holdCommand() {
+    return run(this::runOpenLoop);
+  }
+}
