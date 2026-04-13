@@ -14,6 +14,10 @@ Stable layers:
 - `commands`: behavior orchestration and operator intent
 - `constants`: ports, controller ids, tunables, and robot identity
 
+Allowed exception:
+
+- vendor-generated Phoenix Tuner swerve files may stay grouped together so regeneration stays low-friction; treat generated drivetrain constants as the source of truth instead of forcing them into `Ports`
+
 Seasonal layers:
 
 - scoring sequences
@@ -45,8 +49,8 @@ Add deeper packages only when the project grows enough to justify them, for exam
 
 - instantiate `RobotContainer`
 - call the command scheduler in `robotPeriodic()`
-- schedule the autonomous command in `autonomousInit()`
-- cancel or replace autonomous on teleop start
+- keep autonomous orchestration declarative when possible instead of hand-scheduling from `autonomousInit()`
+- reserve mode-specific lifecycle overrides for real robot concerns, not routine container wiring
 
 `Robot` should not directly read joysticks, command actuators, or coordinate subsystem logic.
 
@@ -55,9 +59,12 @@ Add deeper packages only when the project grows enough to justify them, for exam
 - own subsystem instances
 - own controller objects
 - declare trigger bindings
-- expose the selected autonomous command
+- configure autonomous selection or routine registration
 
 If `RobotContainer` becomes crowded, extract helper methods, not global singletons.
+
+For new repos, prefer a dedicated `AutoRoutines` layer configured during `RobotContainer`
+construction instead of the older `getAutonomousCommand()` pattern.
 
 ### Subsystems
 
@@ -83,6 +90,10 @@ Split constants by concern instead of building one giant file:
 - `Ports`
 - `<Mechanism>Constants`
 - `RobotIdentity`
+
+Exception:
+
+- Phoenix Tuner generated swerve configs such as `TunerConstants` stay with the generated drivetrain code instead of being copied into `Ports`
 
 ## Reuse Rule
 

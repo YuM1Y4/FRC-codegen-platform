@@ -86,7 +86,8 @@ def main() -> int:
     print("Next steps:")
     print("  1. Merge or verify GradleRIO and vendor dependencies in the target repo.")
     print("  2. Add your first real mechanism with scripts/add_mechanism.py.")
-    print("  3. Run the validation checklist in references/validation-checklist.md.")
+    print("  3. Register your first real auto routine in src/main/java/frc/robot/commands/AutoRoutines.java.")
+    print("  4. Run the validation checklist in references/validation-checklist.md.")
     return 0
 
 

@@ -4,6 +4,20 @@
 
 Generated or refactored robot code should pass a lightweight sanity review before more features are added.
 
+Recommended scripted entrypoint:
+
+```bash
+python3 scripts/validate_project.py --project-root /path/to/robot-repo
+```
+
+If the repo does not carry its own `gradlew`, ask the user where WPILib VS Code is installed and prefer:
+
+```bash
+python3 scripts/validate_project.py --project-root /path/to/robot-repo --wpilib-vscode-root /path/to/wpilib/vscode
+```
+
+Use `--run-sim` only when the target repo exposes a safe desktop simulation task and you explicitly want that check.
+
 ## Structure checks
 
 - `Robot` only owns lifecycle and scheduling
@@ -22,8 +36,8 @@ Use the tasks already present in the target project instead of inventing new too
 
 ## Behavioral checks
 
-- autonomous command can still be selected and scheduled
-- teleop init cancels or replaces autonomous intentionally
+- autonomous can still be selected and scheduled, either through a legacy command getter or a declarative auto routine layer
+- autonomous stop or handoff behavior is intentional when the robot leaves autonomous
 - default commands are assigned where expected
 - new bindings have an obvious owner and trigger location
 

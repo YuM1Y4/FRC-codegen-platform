@@ -38,6 +38,11 @@ Prefer full words over short abbreviations unless the team already uses an estab
 - tunables belong in a mechanism-specific constants file
 - keep units in the constant name when ambiguity is possible
 
+Phoenix Tuner exception:
+
+- keep generated swerve ids, offsets, gearing, and module geometry inside the generated `TunerConstants` file so future regenerations stay diff-friendly
+- do not duplicate those same drivetrain constants into `Ports` unless the user explicitly wants a custom non-generated path
+
 Examples:
 
 - `MAX_SPEED_METERS_PER_SECOND`

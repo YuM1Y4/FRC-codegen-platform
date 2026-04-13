@@ -101,11 +101,32 @@ public class ExampleSubsystem extends SubsystemBase {
 }
 """
 
+LEGACY_PORTS_TEMPLATE = """package frc.robot.constants;
+
+public final class Ports {
+  public static final class Example {
+    public static final int MOTOR_ID = 0;
+
+    private Example() {}
+  }
+
+  // __MECHANISM_PORTS__
+
+  private Ports() {}
+}
+"""
+
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Add a basic mechanism scaffold to a robot repo.")
     parser.add_argument("--project-root", required=True, help="Root of the target robot repo.")
     parser.add_argument("--name", required=True, help='Mechanism name, for example "shooter pivot".')
+    parser.add_argument(
+        "--motor-id",
+        type=int,
+        default=0,
+        help="Motor id placeholder to write into Ports.<Mechanism>.MOTOR_ID. Defaults to 0.",
+    )
     parser.add_argument(
         "--default-command",
         action="store_true",
@@ -269,6 +290,62 @@ def trim_blank_line_before_marker(lines: list[str], marker: str) -> bool:
     return True
 
 
+def insert_port_block(lines: list[str], mechanism_class: str, motor_id: int) -> bool:
+    class_signature = f"  public static final class {mechanism_class} {{"
+    if class_signature in lines:
+        return False
+
+    block = [
+        f"  public static final class {mechanism_class} {{",
+        f"    public static final int MOTOR_ID = {motor_id};",
+        "",
+        f"    private {mechanism_class}() {{}}",
+        "  }",
+        "",
+    ]
+
+    marker_index = find_marker_index(lines, "__MECHANISM_PORTS__")
+    if marker_index is not None:
+        lines[marker_index:marker_index] = block
+        return True
+
+    for index, line in enumerate(lines):
+        if line.strip() == "private Ports() {}":
+            lines[index:index] = block
+            return True
+
+    raise ValueError("Could not find a place to insert mechanism ports in Ports.java.")
+
+
+def cleanup_legacy_ports(ports_path: Path) -> list[str]:
+    if not ports_path.exists():
+        return []
+
+    text = ports_path.read_text(encoding="utf-8")
+    if text == LEGACY_PORTS_TEMPLATE:
+        cleaned = """package frc.robot.constants;
+
+public final class Ports {
+  // __MECHANISM_PORTS__
+
+  private Ports() {}
+}
+"""
+        ports_path.write_text(cleaned, encoding="utf-8")
+        return ["removed legacy Example ports placeholder"]
+
+    return []
+
+
+def update_ports(ports_path: Path, mechanism_class: str, motor_id: int) -> list[str]:
+    lines = ports_path.read_text(encoding="utf-8").splitlines()
+    changes: list[str] = []
+    if insert_port_block(lines, mechanism_class, motor_id):
+        changes.append(f"ports wiring: Ports.{mechanism_class}.MOTOR_ID = {motor_id}")
+    ports_path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+    return changes
+
+
 def cleanup_legacy_robot_container(robot_container_path: Path) -> list[str]:
     lines = robot_container_path.read_text(encoding="utf-8").splitlines()
     changes: list[str] = []
@@ -357,6 +434,7 @@ def cleanup_legacy_starter(package_root: Path, robot_container_path: Path) -> li
     changes.extend(cleanup_legacy_robot_container(robot_container_path))
     changes.extend(cleanup_legacy_autos(package_root / "commands" / "Autos.java"))
     changes.extend(cleanup_legacy_example_files(package_root))
+    changes.extend(cleanup_legacy_ports(package_root / "constants" / "Ports.java"))
     return changes
 
 
@@ -426,6 +504,7 @@ def main() -> int:
     package_root = project_root / "src" / "main" / "java" / "frc" / "robot"
     templates_root = repo_root / "templates" / "modules" / "basic-mechanism"
     robot_container_path = package_root / "RobotContainer.java"
+    ports_path = package_root / "constants" / "Ports.java"
 
     if not package_root.exists():
         raise FileNotFoundError(
@@ -434,6 +513,8 @@ def main() -> int:
         )
     if not robot_container_path.exists():
         raise FileNotFoundError(f"Expected RobotContainer.java at {robot_container_path}")
+    if not ports_path.exists():
+        raise FileNotFoundError(f"Expected Ports.java at {ports_path}")
 
     mechanism_class = to_pascal_case(args.name)
     field_name = to_camel_case(mechanism_class)
@@ -460,6 +541,7 @@ def main() -> int:
         replacements,
     )
     cleanup_changes = cleanup_legacy_starter(package_root, robot_container_path)
+    ports_changes = update_ports(ports_path, mechanism_class, args.motor_id)
     container_changes = update_robot_container(
         robot_container_path,
         mechanism_class,
@@ -473,6 +555,10 @@ def main() -> int:
     if cleanup_changes:
         print("Cleaned legacy starter placeholders:")
         for change in cleanup_changes:
+            print(f"  - {change}")
+    if ports_changes:
+        print("Applied Ports.java updates:")
+        for change in ports_changes:
             print(f"  - {change}")
     if container_changes:
         print("Applied RobotContainer updates:")
