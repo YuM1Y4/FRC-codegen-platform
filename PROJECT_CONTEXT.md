@@ -42,6 +42,7 @@ Update this tracker whenever a feature is completed or a new user requirement ch
 - [x] Formalize `frc-mechanism-scaffold` as a standalone skill on top of the existing script/template support.
 - [x] Formalize `frc-swerve-drive` around Phoenix Tuner X generated drivetrain integration instead of hand-written generic swerve boilerplate.
 - [x] Update the starter template to use a 2026-style declarative autonomous structure built around `AutoRoutines`, dashboard chooser wiring, and mode-trigger scheduling.
+- [x] Add a GitHub-facing `README.md` that explains the platform's purpose, workflow, benefits, and current usage.
 
 ### In Progress
 
@@ -65,6 +66,7 @@ Update this tracker whenever a feature is completed or a new user requirement ch
 - [x] 2026-04-14: Start implementing `frc-swerve-drive`.
 - [x] 2026-04-14: Update the platform so Phoenix Tuner X generated `TunerConstants` and `CommandSwerveDrivetrain` are the default `frc-swerve-drive` path for modern CTRE swerve projects.
 - [x] 2026-04-14: Inspect `/Users/yumi/Documents/frc/2026CompetitiveConcept` and fold its declarative autonomous structure into the starter template and validation guidance.
+- [x] 2026-04-14: Add a GitHub homepage README so new visitors can understand what the platform is, why it exists, and how to use it.
 
 ## Recommended Skill System
 
